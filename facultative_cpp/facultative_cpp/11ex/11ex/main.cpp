@@ -15,7 +15,7 @@ int main(int argc, const char * argv[]) {
     }
     
     for (int j = 0; j < n; j++) {
-        out << std::scientific << ans[j] << "\n";
+        out << ans[j] << "\n";
     }
     
     return 0;
