@@ -1,49 +1,51 @@
 #include <iostream>
 #include <fstream>
-#include <math.h>
 
 int main(int argc, const char * argv[]) {
     std::ofstream fout, fout_h, fout_consts;
-    fout.open("output.bin");
-    fout_h.open("output_h.bin");
-    fout_consts.open("output_consts.bin");
-    
-    float x_0 = 10;
-    float v_0 = 0;
-    
-    float omega = 100;
+    fout.open("output.json");
+    fout_h.open("output_h.json");
+    fout_consts.open("output_consts.json");
     
     
     
-    float delta_t = 0.001;
+    long double x_0 = atof(argv[1]);
+    long double v_0 = atof(argv[2]);
+    
+    long double omega = atof(argv[3]);
+    
+    long double delta_t = atof(argv[4]);
 
-    float v_i = v_0;
-    float x_i = x_0;
-    float E_i = (1 / (omega * omega)) * x_i * x_i / 2 + v_i * v_i /2;
+    long double v_i = v_0;
+    long double x_i = x_0;
+    long double E_i = (omega * omega) * x_i * x_i / 2 + v_i * v_i /2;
     
     fout_consts << x_0 << " " << v_0 << " " << omega << " " << E_i;
     
-    float v_i_h = v_0;
-    float x_i_h = x_0;
-    float E_i_h = (1 / (omega * omega)) * x_i_h * x_i_h / 2 + v_i_h * v_i_h /2;
+    long double v_i_h = v_0;
+    long double x_i_h = x_0;
+    long double E_i_h = (omega * omega) * x_i_h * x_i_h / 2 + v_i_h * v_i_h /2;
     
-    float t = 0;
+    long double t = 0;
     
-    float temp_x_i;
-    float temp_x_i_h;
+    long double max_t = atof(argv[5]);
     
-    float k_1_x, k_2_x, k_1_v, k_2_v;
+    long double temp_x_i;
+    long double temp_x_i_h;
     
-    fout << t << " " << x_i << " " << v_i << " " << E_i << std::endl;
+    long double k_1_x, k_2_x, k_1_v, k_2_v;
     
-    fout_h << t << " " << x_i_h << " " << v_i_h << " " << E_i_h << std::endl;
+//    fout << t << " " << x_i << " " << v_i << " " << E_i << std::endl;
+//
+//    fout_h << t << " " << x_i_h << " " << v_i_h << " " << E_i_h << std::endl;
     
-    while (t < 1000) {
+    while (t < max_t) {
 //        метод эйлера
         temp_x_i = x_i;
         x_i = x_i + delta_t * v_i;
         v_i = v_i - delta_t * temp_x_i * omega * omega;
-        E_i = (1 / (omega * omega)) * x_i * x_i / 2 + v_i * v_i / 2;
+        E_i = (omega * omega) * x_i * x_i / 2 + v_i * v_i / 2;
+        fout.precision(1000);
         fout << t << " " << x_i << " " << v_i << " " << E_i << std::endl;
 //        метод хойна
         temp_x_i_h = x_i_h;
@@ -53,8 +55,8 @@ int main(int argc, const char * argv[]) {
         k_2_v = -delta_t * (x_i_h + k_1_x) * omega * omega;
         x_i_h = x_i_h + (k_1_x + k_2_x) / 2;
         v_i_h = v_i_h + (k_1_v + k_2_v) / 2;
-        E_i_h = (1 / (omega * omega)) * x_i_h * x_i_h / 2 + v_i_h * v_i_h / 2;
-        
+        E_i_h = (omega * omega) * x_i_h * x_i_h / 2 + v_i_h * v_i_h / 2;
+        fout_h.precision(1000);
         fout_h << t << " " << x_i_h << " " << v_i_h << " " << E_i_h << std::endl;
         
         t += delta_t;
