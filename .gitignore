@@ -1,0 +1,12 @@
+*.xcodeproj/*
+*.xcworkspace/*
+!*.xcodeproj/project.pbxproj
+*/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/contents.xcworkspacedata
+*.bin
+*.xcodeproj/
+*.xcworkspace/
+project.xcworkspace
+facultative_cpp/cpp_3_week/week_3/week_3.xcodeproj
+.idea
