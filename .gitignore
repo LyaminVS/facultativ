@@ -10,3 +10,5 @@
 project.xcworkspace
 facultative_cpp/cpp_3_week/week_3/week_3.xcodeproj
 .idea
+*.txt
+jupyter/.ipynb_checkpoints/week_7-checkpoint.ipynb
