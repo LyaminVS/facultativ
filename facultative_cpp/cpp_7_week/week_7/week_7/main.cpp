@@ -1,7 +1,11 @@
 #include <iostream>
 #include <array>
+#include <vector>
 #include <fstream>
 #include <cmath>
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 template <typename solver_class, typename state_class>
 class Solver{
@@ -12,17 +16,18 @@ public:
         this->step = step;
         this->first_state = first_state;
         this->length = (int)((to - from) / step);
-        this->all_states = new state_class[(int)length];
         this->solver = solver_class();
     }
     
     void Solve(){
         float t = from;
-        all_states[0] = first_state;
+        times.push_back(t);
+        all_states.push_back(first_state);
         int i = 1;
         while (t < to) {
-            all_states[i] = solver.make_step(all_states[i - 1], step, t);
+            all_states.push_back(solver.make_step(all_states[i - 1], step, t));
             t += step;
+            times.push_back(t);
             i++;
         }
     }
@@ -31,7 +36,7 @@ public:
         std::ofstream f;
         f.open(filename);
         for (int i = 0; i < length; i++) {
-            f << all_states[i].to_str();
+            f << std::to_string(times[i]) << "\t" << all_states[i].to_str();
         }
         f.close();
     }
@@ -49,7 +54,8 @@ private:
     float from, to, step, length;
     solver_class solver;
     state_class first_state;
-    state_class* all_states;
+    std::vector<state_class> all_states;
+    std::vector<float> times;
 };
 
 
@@ -276,7 +282,7 @@ public:
     }
     
     Forced dfdt(float t){
-        return Forced(data[1], A * cos(omega_f * t) -this->omega * this->omega * sin(data[0]) - 2 * this->gamma * data[1], this->omega, this->gamma, this->omega_f, this->A);
+        return Forced(data[1], A * cos(omega_f * t) - this->omega * this->omega * sin(data[0]) - 2 * this->gamma * this->omega * data[1], this->omega, this->gamma, this->omega_f, this->A);
     }
     
     void print(){
@@ -297,47 +303,65 @@ public:
 };
 
 int main(int argc, const char * argv[]) {
-    if (atoi(argv[1]) == 0){
-        float x_0 = atof(argv[2]);
-        float v_0 = atof(argv[3]);
-        float omega = atof(argv[4]);
-        float from = atof(argv[5]);
-        float to = atof(argv[6]);
-        float delta = atof(argv[7]);
-        MyClass a = MyClass(x_0, v_0, omega);
-        Solver<Euler<MyClass>, MyClass> solver = Solver<Euler<MyClass>, MyClass>(from, to, delta, a);
-        solver.Solve();
-        solver.dump("output.txt");
+    std::ifstream f(argv[1]);
+
+    json data = json::parse(f);
+
+    int type = std::stoi(data.value("type", "oops"));
+    
+    std::cout << type;
+    
+    if (type == 0){
+
     }
-    else if(atoi(argv[1]) == 1){
-        float x_0 = atof(argv[2]);
-        float v_0 = atof(argv[3]);
-        float omega = atof(argv[4]);
-        float gamma = atof(argv[5]);
-        float from = atof(argv[6]);
-        float to = atof(argv[7]);
-        float delta = atof(argv[8]);
-        Fading a = Fading(x_0, v_0, omega, gamma);
-        Solver<Euler<Fading>, Fading> solver = Solver<Euler<Fading>, Fading>(from, to, delta, a);
-        solver.Solve();
-        solver.dump("output_f.txt");
+    else if (type == 1){
+
     }
-    else if(atoi(argv[1]) == 2){
-        float x_0 = atof(argv[2]);
-        float v_0 = atof(argv[3]);
-        float omega = atof(argv[4]);
-        float gamma = atof(argv[5]);
-        float omega_f = atof(argv[6]);
-        float A = atof(argv[7]);
-        float from = atof(argv[8]);
-        float to = atof(argv[9]);
-        float delta = atof(argv[10]);
-        
-        Forced a = Forced(x_0, v_0, omega, gamma, omega_f, A);
-        Solver<RungeKutta<Forced>, Forced> solver = Solver<RungeKutta<Forced>, Forced>(from, to, delta, a);
-        solver.Solve();
-        solver.dump("output_rk.txt");
+    else if (type == 2){
+
     }
+    
+//    if (atoi(argv[1]) == 0){
+//        float x_0 = atof(argv[2]);
+//        float v_0 = atof(argv[3]);
+//        float omega = atof(argv[4]);
+//        float from = atof(argv[5]);
+//        float to = atof(argv[6]);
+//        float delta = atof(argv[7]);
+//        MyClass a = MyClass(x_0, v_0, omega);
+//        Solver<Euler<MyClass>, MyClass> solver = Solver<Euler<MyClass>, MyClass>(from, to, delta, a);
+//        solver.Solve();
+//        solver.dump("output.txt");
+//    }
+//    else if(atoi(argv[1]) == 1){
+//        float x_0 = atof(argv[2]);
+//        float v_0 = atof(argv[3]);
+//        float omega = atof(argv[4]);
+//        float gamma = atof(argv[5]);
+//        float from = atof(argv[6]);
+//        float to = atof(argv[7]);
+//        float delta = atof(argv[8]);
+//        Fading a = Fading(x_0, v_0, omega, gamma);
+//        Solver<Euler<Fading>, Fading> solver = Solver<Euler<Fading>, Fading>(from, to, delta, a);
+//        solver.Solve();
+//        solver.dump("output_f.txt");
+//    }
+//    else if(atoi(argv[1]) == 2){
+//        float x_0 = atof(argv[2]);
+//        float v_0 = atof(argv[3]);
+//        float omega = atof(argv[4]);
+//        float gamma = atof(argv[5]);
+//        float omega_f = atof(argv[6]);
+//        float A = atof(argv[7]);
+//        float from = atof(argv[8]);
+//        float to = atof(argv[9]);
+//        float delta = atof(argv[10]);
+//
+//        Forced a = Forced(x_0, v_0, omega, gamma, omega_f, A);
+//        Solver<RungeKutta<Forced>, Forced> solver = Solver<RungeKutta<Forced>, Forced>(from, to, delta, a);
+//        solver.Solve();
+//        solver.dump("output_rk.txt");
+//    }
     
     return 0;
 }
