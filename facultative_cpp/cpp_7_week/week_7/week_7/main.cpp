@@ -100,16 +100,16 @@ public:
     }
 };
 
-class MyClass{
+class SimpleGarmonic{
 public:
     std::array<float, 2> data;
     int length;
     float omega;
     
-    MyClass(){
+    SimpleGarmonic(){
     }
     
-    MyClass(float x_0, float v_0, float omega){
+    SimpleGarmonic(float x_0, float v_0, float omega){
         this->length = 2;
         this->omega = 1;
         data[0] = x_0;
@@ -121,8 +121,8 @@ public:
         return data[i];
     }
     
-    MyClass operator*(float c) {
-        MyClass ans = MyClass();
+    SimpleGarmonic operator*(float c) {
+        SimpleGarmonic ans = SimpleGarmonic();
         ans.omega = this->omega;
         ans.length = this->length;
         for(int i = 0; i < this->length; i++){
@@ -131,8 +131,8 @@ public:
         return ans;
     }
     
-    MyClass operator+(MyClass second) {
-        MyClass ans = MyClass();
+    SimpleGarmonic operator+(SimpleGarmonic second) {
+        SimpleGarmonic ans = SimpleGarmonic();
         ans.omega = this->omega;
         ans.length = this->length;
         for(int i = 0; i < this->length; i++){
@@ -141,8 +141,8 @@ public:
         return ans;
     }
     
-    MyClass dfdt(float t){
-        return MyClass(data[1], -this->omega * this->omega * sin(data[0]), this->omega);
+    SimpleGarmonic dfdt(float t){
+        return SimpleGarmonic(data[1], -this->omega * this->omega * sin(data[0]), this->omega);
     }
     
     void print(){
@@ -302,26 +302,60 @@ int main(int argc, const char * argv[]) {
 
     int type = std::stoi(data.value("type", "oops"));
     
+    int method_type = std::stoi(data.value("method_type", "oops"));
+    
     std::cout << type;
     
-    if (type == 0){
-        MyClass a = MyClass(std::stof(data.value("x_0", "oops")), std::stof(data.value("v_0", "oops")), std::stof(data.value("omega", "oops")));
-        Solver<Euler<MyClass>, MyClass> solver = Solver<Euler<MyClass>, MyClass>(std::stof(data.value("from", "oops")), std::stof(data.value("to", "oops")), std::stof(data.value("delta", "oops")), a);
-        solver.Solve();
-        solver.dump("output.txt");
+
+    
+    using ModelType = SimpleGarmonic;
+    
+    if (type == 0) {
+        using ModelType = SimpleGarmonic;
     }
-    else if (type == 1){
-        Fading a = Fading(std::stof(data.value("x_0", "oops")), std::stof(data.value("v_0", "oops")), std::stof(data.value("omega", "oops")), std::stof(data.value("gamma", "oops")));
-        Solver<Euler<Fading>, Fading> solver = Solver<Euler<Fading>, Fading>(std::stof(data.value("from", "oops")), std::stof(data.value("to", "oops")), std::stof(data.value("delta", "oops")), a);
-        solver.Solve();
-        solver.dump("output_f.txt");
+    else if (type == 1) {
+        using ModelType = Fading;
     }
-    else if (type == 2){
-        Forced a = Forced(std::stof(data.value("x_0", "oops")), std::stof(data.value("v_0", "oops")), std::stof(data.value("omega", "oops")), std::stof(data.value("gamma", "oops")), std::stof(data.value("omega_f", "oops")), std::stof(data.value("A", "oops")));
-        Solver<RungeKutta<Forced>, Forced> solver = Solver<RungeKutta<Forced>, Forced>(std::stof(data.value("from", "oops")), std::stof(data.value("to", "oops")), std::stof(data.value("delta", "oops")), a);
-        solver.Solve();
-        solver.dump("output_rk.txt");
+    else{
+        using ModelType = Forced;
     }
+    
+    using AccuracyType = Euler<ModelType>;
+    
+    if (method_type == 0) {
+        using AccuracyType = Euler<ModelType>;
+    }
+    else if (method_type == 1) {
+        using AccuracyType = Hoin<ModelType>;
+    }
+    else{
+        using AccuracyType = RungeKutta<ModelType>;
+    }
+    
+    ModelType a = ModelType(std::stof(data.value("x_0", "oops")), std::stof(data.value("v_0", "oops")), std::stof(data.value("omega", "oops")));
+    Solver<AccuracyType, ModelType> solver = Solver<AccuracyType, ModelType>(std::stof(data.value("from", "oops")), std::stof(data.value("to", "oops")), std::stof(data.value("delta", "oops")), a);
+    solver.Solve();
+    solver.dump("output.txt");
+    
+    
+//    if (type == 0){
+//        MyClass a = MyClass(std::stof(data.value("x_0", "oops")), std::stof(data.value("v_0", "oops")), std::stof(data.value("omega", "oops")));
+//        Solver<Euler<MyClass>, MyClass> solver = Solver<Euler<MyClass>, MyClass>(std::stof(data.value("from", "oops")), std::stof(data.value("to", "oops")), std::stof(data.value("delta", "oops")), a);
+//        solver.Solve();
+//        solver.dump("output.txt");
+//    }
+//    else if (type == 1){
+//        Fading a = Fading(std::stof(data.value("x_0", "oops")), std::stof(data.value("v_0", "oops")), std::stof(data.value("omega", "oops")), std::stof(data.value("gamma", "oops")));
+//        Solver<Euler<Fading>, Fading> solver = Solver<Euler<Fading>, Fading>(std::stof(data.value("from", "oops")), std::stof(data.value("to", "oops")), std::stof(data.value("delta", "oops")), a);
+//        solver.Solve();
+//        solver.dump("output_f.txt");
+//    }
+//    else if (type == 2){
+//        Forced a = Forced(std::stof(data.value("x_0", "oops")), std::stof(data.value("v_0", "oops")), std::stof(data.value("omega", "oops")), std::stof(data.value("gamma", "oops")), std::stof(data.value("omega_f", "oops")), std::stof(data.value("A", "oops")));
+//        Solver<RungeKutta<Forced>, Forced> solver = Solver<RungeKutta<Forced>, Forced>(std::stof(data.value("from", "oops")), std::stof(data.value("to", "oops")), std::stof(data.value("delta", "oops")), a);
+//        solver.Solve();
+//        solver.dump("output_rk.txt");
+//    }
     
 
     return 0;
