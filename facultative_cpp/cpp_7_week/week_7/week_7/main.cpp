@@ -10,14 +10,7 @@ using json = nlohmann::json;
 template <typename solver_class, typename state_class>
 class Solver{
 public:
-    Solver(float from, float to, float step, state_class first_state){
-        this->from = from;
-        this->to = to;
-        this->step = step;
-        this->first_state = first_state;
-        this->length = (int)((to - from) / step);
-        this->solver = solver_class();
-    }
+    Solver(float from, float to, float step, state_class first_state): from(from), to(to), step(step), first_state(first_state), length((int)((to - from) / step)), solver(solver_class()){}
     
     void Solve(){
         float t = from;
@@ -330,47 +323,6 @@ int main(int argc, const char * argv[]) {
         solver.dump("output_rk.txt");
     }
     
-//    if (atoi(argv[1]) == 0){
-//        float x_0 = atof(argv[2]);
-//        float v_0 = atof(argv[3]);
-//        float omega = atof(argv[4]);
-//        float from = atof(argv[5]);
-//        float to = atof(argv[6]);
-//        float delta = atof(argv[7]);
-//        MyClass a = MyClass(x_0, v_0, omega);
-//        Solver<Euler<MyClass>, MyClass> solver = Solver<Euler<MyClass>, MyClass>(from, to, delta, a);
-//        solver.Solve();
-//        solver.dump("output.txt");
-//    }
-//    else if(atoi(argv[1]) == 1){
-//        float x_0 = atof(argv[2]);
-//        float v_0 = atof(argv[3]);
-//        float omega = atof(argv[4]);
-//        float gamma = atof(argv[5]);
-//        float from = atof(argv[6]);
-//        float to = atof(argv[7]);
-//        float delta = atof(argv[8]);
-//        Fading a = Fading(x_0, v_0, omega, gamma);
-//        Solver<Euler<Fading>, Fading> solver = Solver<Euler<Fading>, Fading>(from, to, delta, a);
-//        solver.Solve();
-//        solver.dump("output_f.txt");
-//    }
-//    else if(atoi(argv[1]) == 2){
-//        float x_0 = atof(argv[2]);
-//        float v_0 = atof(argv[3]);
-//        float omega = atof(argv[4]);
-//        float gamma = atof(argv[5]);
-//        float omega_f = atof(argv[6]);
-//        float A = atof(argv[7]);
-//        float from = atof(argv[8]);
-//        float to = atof(argv[9]);
-//        float delta = atof(argv[10]);
-//
-//        Forced a = Forced(x_0, v_0, omega, gamma, omega_f, A);
-//        Solver<RungeKutta<Forced>, Forced> solver = Solver<RungeKutta<Forced>, Forced>(from, to, delta, a);
-//        solver.Solve();
-//        solver.dump("output_rk.txt");
-//    }
-    
+
     return 0;
 }
