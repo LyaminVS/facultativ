@@ -312,13 +312,22 @@ int main(int argc, const char * argv[]) {
     std::cout << type;
     
     if (type == 0){
-
+        MyClass a = MyClass(std::stof(data.value("x_0", "oops")), std::stof(data.value("v_0", "oops")), std::stof(data.value("omega", "oops")));
+        Solver<Euler<MyClass>, MyClass> solver = Solver<Euler<MyClass>, MyClass>(std::stof(data.value("from", "oops")), std::stof(data.value("to", "oops")), std::stof(data.value("delta", "oops")), a);
+        solver.Solve();
+        solver.dump("output.txt");
     }
     else if (type == 1){
-
+        Fading a = Fading(std::stof(data.value("x_0", "oops")), std::stof(data.value("v_0", "oops")), std::stof(data.value("omega", "oops")), std::stof(data.value("gamma", "oops")));
+        Solver<Euler<Fading>, Fading> solver = Solver<Euler<Fading>, Fading>(std::stof(data.value("from", "oops")), std::stof(data.value("to", "oops")), std::stof(data.value("delta", "oops")), a);
+        solver.Solve();
+        solver.dump("output_f.txt");
     }
     else if (type == 2){
-
+        Forced a = Forced(std::stof(data.value("x_0", "oops")), std::stof(data.value("v_0", "oops")), std::stof(data.value("omega", "oops")), std::stof(data.value("gamma", "oops")), std::stof(data.value("omega_f", "oops")), std::stof(data.value("A", "oops")));
+        Solver<RungeKutta<Forced>, Forced> solver = Solver<RungeKutta<Forced>, Forced>(std::stof(data.value("from", "oops")), std::stof(data.value("to", "oops")), std::stof(data.value("delta", "oops")), a);
+        solver.Solve();
+        solver.dump("output_rk.txt");
     }
     
 //    if (atoi(argv[1]) == 0){
