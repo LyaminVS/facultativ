@@ -13,3 +13,4 @@ facultative_cpp/cpp_3_week/week_3/week_3.xcodeproj
 *.txt
 jupyter/.ipynb_checkpoints/week_7-checkpoint.ipynb
 jupyter/.ipynb_checkpoints/week_3-checkpoint.ipynb
+*.json
